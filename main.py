@@ -17,6 +17,7 @@ reader = easyocr.Reader(['en'])
 tabs = (115, 8, 838, 40)
 address_bar = (135, 45, 657, 77)
 browser_body_full = (5, 115, 941, 1027)
+task = 'You need to apply to a job.'
 
 
 # PY FILES SETUP & COMMANDS
@@ -43,7 +44,7 @@ def run_llm():
     prompt = (
         "You need to click a button or link. "
         f"Each context is located within the brackets: {ocr_results}. "
-        "You need to check the weather. "
+        f"{task} "
         "Which context do you chose in this scenario? "
         "Choose a context, or say 'wait' if no context is given. "
         "Only say the option you chose. "
