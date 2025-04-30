@@ -6,13 +6,17 @@ import ollama
 import easyocr
 from PIL import ImageGrab
 
+
 # INITIALIZE SETUP
 screen_width, screen_height = pyautogui.size()
 browser = ''
-#my_browser.setup_browser(screen_width, screen_height)
+# USE IF BROWSER NOT SET UP:
+# my_browser.setup_browser(screen_width, screen_height)
 active_tab = ''
-#active_tab = my_browser.get_tab()
-#my_browser.setup_ide(screen_width, screen_height)
+# GET ACTIVE TAB:
+# active_tab = my_browser.get_tab()
+# USE IF IDE NOT SET UP:
+# my_browser.setup_ide(screen_width, screen_height)
 reader = easyocr.Reader(['en'])
 tabs = (115, 8, 838, 40)
 address_bar = (135, 45, 657, 77)
@@ -25,11 +29,8 @@ def run_decision(command):
     print(f'\n--LLM DECISION: {command}')
     if command == 'wait':
         print('--LLM WILL WAIT FOR NEXT TASK')
-    elif command == 'Weather':
-        print('Success!')
-        quit()
     else:
-        print('--COMMAND ERROR')
+        my_ocr.check_word(region, word_coord, llm_output)
 
 def run_ocr():
     global ocr_results, region, word_coord
@@ -41,6 +42,7 @@ def run_ocr():
         ocr_results.append(word)
 
 def run_llm():
+    global llm_output
     prompt = (
         "You need to click a button or link. "
         f"Each context is located within the brackets: {ocr_results}. "
@@ -51,8 +53,6 @@ def run_llm():
         "/no_think" # /no_think for qwen3 use case
     )
     llm_output = my_llm.run_think(ocr_results, prompt)
-    if llm_output != 'wait':
-        my_ocr.check_word(region, word_coord, llm_output)
     run_decision(llm_output)
 
 run_ocr()
