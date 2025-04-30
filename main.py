@@ -16,32 +16,43 @@ active_tab = ''
 reader = easyocr.Reader(['en'])
 tabs = (115, 8, 838, 40)
 address_bar = (135, 45, 657, 77)
-bbody_full = (5, 115, 941, 1027)
+browser_body_full = (5, 115, 941, 1027)
 
 
 # PY FILES SETUP & COMMANDS
+def run_decision(command):
+    print(f'\n--LLM DECISION: {command}')
+    if command == 'wait':
+        print('--LLM WILL WAIT FOR NEXT TASK')
+    elif command == 'Weather':
+        print('Success!')
+        quit()
+    else:
+        print('--COMMAND ERROR')
+
 def run_ocr():
-    global ocr_results
+    global ocr_results, region, word_coord
     ocr_results = []
-    region = bbody_full
+    region = browser_body_full
     image = ImageGrab.grab(bbox=region)
     word_coord = my_ocr.view_screen(reader, region, image)
     for word, coord in word_coord:
         ocr_results.append(word)
-    #my_ocr.check_word(region, word_coord, '66')
-
 
 def run_llm():
-    options = [f'{ocr_results}', 'wait']
     prompt = (
-        "You have a list of words and options. "
-        f"The words in the brackets are {ocr_results}. "
-        f"Your options are {options}. "
+        "You need to click a button or link. "
+        f"Each context is located within the brackets: {ocr_results}. "
         "You need to check the weather. "
-        "Which word do you chose in this scenario? "
-        "Only say the option you chose."
+        "Which context do you chose in this scenario? "
+        "Choose a context, or say 'wait' if no context is given. "
+        "Only say the option you chose. "
+        "/no_think" # /no_think for qwen3 use case
     )
-    my_llm.run_think(ocr_results, options, prompt)
+    llm_output = my_llm.run_think(ocr_results, prompt)
+    if llm_output != 'wait':
+        my_ocr.check_word(region, word_coord, llm_output)
+    run_decision(llm_output)
 
 run_ocr()
 run_llm()

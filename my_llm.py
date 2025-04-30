@@ -1,17 +1,9 @@
 import ollama
+import re
 
-def run_think(ocr_results, options, prompt):
+def run_think(ocr_results, prompt):
+    global llm_output
     print(prompt)
-    response = ollama.generate(model='gemma3:4b', prompt=prompt)
-    llm_output = response['response'].strip()
-    run_decision(llm_output)
-
-def run_decision(command):
-    print(f'\n--LLM DECISION: {command}')
-    if command == 'hello':
-        print('Hello! How Are you?')
-    if command == 'goodbye':
-        print('Goodbye')
-        quit()
-    else:
-        print('--COMMAND ERROR')
+    response = ollama.generate(model='qwen3:8b', prompt=prompt, stream=False)
+    llm_output = re.sub(r'<think>.*?</think>\s*', '', response['response'].strip(), flags=re.DOTALL)
+    return llm_output
