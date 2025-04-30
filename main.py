@@ -18,10 +18,11 @@ active_tab = ''
 # USE IF IDE NOT SET UP:
 # my_browser.setup_ide(screen_width, screen_height)
 reader = easyocr.Reader(['en'])
+# USE COORD_FINDER.PY TO GET THE STATIC REGIONS FOR YOUR DEVICE
 tabs = (115, 8, 838, 40)
 address_bar = (135, 45, 657, 77)
 browser_body_full = (5, 115, 941, 1027)
-task = 'You need to apply to a job.'
+task = 'Click the last available job title.'
 
 
 # PY FILES SETUP & COMMANDS
@@ -43,6 +44,7 @@ def run_ocr():
 
 def run_llm():
     global llm_output
+
     prompt = (
         "You need to click a button or link. "
         f"Each context is located within the brackets: {ocr_results}. "
