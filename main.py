@@ -25,21 +25,19 @@ def get_tab():
     browser = gw.getWindowsWithTitle('edge')
     for app_title in browser:
         active_tab = app_title.title
-
         # IF MULTIPLE TABS ARE OPEN
         if ' and' in active_tab:
             return re.sub(r' and.*', '', active_tab)
-
         # IF ONE TAB IS OPEN
         elif '- Personal' in active_tab:
             return re.sub(r' - Personal.*', '', active_tab)
     else:
         return '--NO BROWSER DETECTED'
 
-def run_ocr():
-    global ocr_results, region, word_coord
+def run_ocr(sector):
+    global region, ocr_results, word_coord
+    region = sector
     ocr_results = []
-    region = browser_top
     image = ImageGrab.grab(bbox=region)
     word_coord = my_ocr.view_screen(reader, region, image)
     for word, coord in word_coord:
@@ -48,26 +46,30 @@ def run_ocr():
 def run_decision(command):
     print(f'\n--LLM DECISION: {command}')
     if command == 'wait':
-        print('--LLM WILL WAIT FOR NEXT TASK')
+        print('--WAITING')
     else:
-        my_ocr.check_word(region, word_coord, llm_output)
+        for word, coord in word_coord:
+            if llm_output in word:
+                coord = ((coord[0] + region[0]), (coord[1] + region[1]))
+                print(f'\n[ {llm_output} ] FOUND HERE: {coord}')
+                pyautogui.moveTo(coord)
 
-def run_llm(action, prompt):
+def run_llm(action, item):
     global llm_output
     if action == 'click':
-        action = (
-            "You need to choose a context related to the task. "
-            f"Each context is located within the brackets: {ocr_results}.\n"
-            f"Here's your task: '{prompt}.'\n"
-            "Choose a context related to the task, or "
-            "If the context doesn't match the task, say 'wait'. "
-            "Only say the context you chose. "
+        request = (
+            "You need to choose a result related to the context. "
+            f"Each result is located within the brackets: {ocr_results}.\n"
+            f"Here's your context: '{item}.'\n"
+            "Choose a result related to the context, or "
+            "if the context doesn't match any result, say 'wait'. "
+            "Only say the result you chose. "
             "/no_think" # /no_think for qwen3 use case
         )
-        llm_output = my_llm.run_think(ocr_results, action)
+        llm_output = my_llm.run_think(ocr_results, request)
         run_decision(llm_output)
     if action == 'adjust':
-        action = (
+        request = (
             "Your task is to correct a mistake or "
             "fragmented result within the results. "
             f"Here are the results: {ocr_results}.\n"
@@ -75,10 +77,10 @@ def run_llm(action, prompt):
             "but don't say anything else. "
             "/no_think" # /no_think for qwen3 use case
         )
-        llm_output = my_llm.run_think(ocr_results, action)
+        llm_output = my_llm.run_think(ocr_results, request)
         print(ocr_results)
         print(llm_output)
 
 # RUN THE PROGRAM HERE
-run_ocr()
-run_llm('click', 'check cart')
+run_ocr(browser_full)
+run_llm('click', 'my account')

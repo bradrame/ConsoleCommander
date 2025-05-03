@@ -51,17 +51,3 @@ def view_screen(reader, region, image):
             #print(f'[{i}]: {line_text}')
             i += 1
     return word_coord
-
-def check_word(region, word_coord, pattern):
-    global coord, found
-    found = False
-    for word, coord in word_coord:
-        if pattern in word:
-            found = True
-            coord = ((coord[0] + region[0]), (coord[1] + region[1]))
-            print(f'\n[ {pattern} ] FOUND HERE: {coord}')
-            pyautogui.moveTo(coord)
-            return coord
-    if not found:
-        print(f'\n[ {pattern} ] WAS NOT FOUND')
-        return None
