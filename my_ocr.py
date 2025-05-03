@@ -13,6 +13,8 @@ def view_screen(reader, region, image):
         left_x = int(bbox[0][0])
         right_x = int(bbox[1][0])
         x_center = int((bbox[0][0] + bbox[2][0]) // 2)
+        top_y = None
+        bottom_y = None
         y_center = int((bbox[0][1] + bbox[2][1]) // 2)
         words.append((y_center, left_x, right_x, text))
         word_coord.append((text, (x_center, y_center)))
@@ -46,14 +48,13 @@ def view_screen(reader, region, image):
         segments.append(current_segment)
         for segment in segments:
             line_text = ' '.join(segment)
-            print(f'[{i}]: {line_text}')
+            #print(f'[{i}]: {line_text}')
             i += 1
     return word_coord
 
 def check_word(region, word_coord, pattern):
     global coord, found
     found = False
-    #view_screen(reader, region, image)
     for word, coord in word_coord:
         if pattern in word:
             found = True
