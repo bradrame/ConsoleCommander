@@ -49,7 +49,7 @@ def run_decision(command):
         print('--WAITING')
     else:
         for word, coord in word_coord:
-            if llm_output in word:
+            if llm_output == word:
                 coord = ((coord[0] + region[0]), (coord[1] + region[1]))
                 print(f'\n[ {llm_output} ] FOUND HERE: {coord}')
                 pyautogui.moveTo(coord)
@@ -83,4 +83,4 @@ def run_llm(action, item):
 
 # RUN THE PROGRAM HERE
 run_ocr(browser_full)
-run_llm('click', 'my account')
+run_llm('click', 'username')
